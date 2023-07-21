@@ -28,7 +28,7 @@ The server allows followings commands sent by the client process:  <br />
 
 ## Client Program
 The client program connects to the server and allows customers to perform banking operations by sending commands to the server and receiving response back from it.
-#### Building the Server
+### Building the Client
 •	To build the client, use the provided Makefile. Simply navigate to the client’s directory and run the following commands:  <br />
 •	make  (if not done before)  <br />
 •	./client_1  <br />
