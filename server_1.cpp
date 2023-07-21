@@ -8,9 +8,6 @@
 #include<unistd.h>
 #include<sstream>
 #include"linkedList.h"
-//#include"bison_parser.tab.h"
-//extern int yyparse();
-//extern FILE* yyin;
 using namespace std;
 #define max_client 10
 
@@ -22,28 +19,9 @@ struct clientInfo{
 int clientCount = 0;
 clientInfo clients[max_client];
 bool active_server_flag = true;
-
+int serverSocket,
 
 bank b;
-/*string process_command(int command_type, YYSTYPE* command_data)
-{
-  string response = "";
-  switch (command_type)
-  {
-  case OPEN_ACCOUNT:
-    int an = b.create_account(command_data->strval);
-    response = "Your account has been created. Account number is: " + to_string(an) + "\n";
-    break;
-  
-  default:
-    response = "Wrong command. \n";
-    cerr << "Error: Invalid command" << endl;
-    break;
-  }
-
-  return response;
-}*/
-
 // client handler function for receiving commands, processing them and sending reply
 void *clientHandler(void *arg)
 {
@@ -175,16 +153,6 @@ void *clientHandler(void *arg)
 
       else if (command == "SHOW" && arg1 == "ACTIVE" && arg2 == "CONNECTIONS")
       {
-        // struct sockaddr_in clientAddress;
-        // socklen_t clientAddressLength = sizeof(clientAddress);
-        // getpeername(clientSocket, (struct sockaddr *)&clientAddress, &clientAddressLength);
-        // char clientIP[INET_ADDRSTRLEN];
-        // inet_ntop(AF_INET, &(clientAddress.sin_addr), clientIP, INET_ADDRSTRLEN);
-        // int clientPort = ntohs(clientAddress.sin_port);
-        // cout << "New connection form " << clientIP << " : " << clientPort << endl;
-        // string ipString(clientIP);
-        // response = "Port number of client is : " + to_string(clientPort) + "\n";
-
         response = "Active connections: \n";
         cout << "Active connections: \n";
         for (int i = 0; i < clientCount; i++)
@@ -218,24 +186,12 @@ void *clientHandler(void *arg)
 
       else if (command == "SHUTDOWN" && arg1 == "SERVER" && arg2 == ".")
       {
-        /*vector<int>::iterator it = find(connected_clients.begin(), connected_clients.end(), clientSocket);
-        if(it != connected_clients.end())
-        {
-          connected_clients.erase(it);
-          active_connections--;
-
-          if (active_connections == 0 && connected_clients.size() == 1)
-          {
-            response = "server shutting down \n";
-            send(clientSocket, response.c_str(), response.length(), 0);
-            break;
-          }
-        }*/
         if (clientCount <= 1)
         {
           active_server_flag = false;
           response = "server shutting down \n";
           send(clientSocket, response.c_str(), response.length(), 0);
+          close(serverSocket);
           break;
         }
         else
@@ -266,7 +222,7 @@ void *clientHandler(void *arg)
 
 int main()
 {
-  int serverSocket, newSocket;
+  int newSocket;
   struct sockaddr_in serverAddr, clientAddr;
   socklen_t addrSize;
   pthread_t thread[max_client];
